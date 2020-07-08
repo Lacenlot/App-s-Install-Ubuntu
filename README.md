@@ -1,2 +1,3 @@
 # App-s-Install-Ubuntu
-A simple script for the first installation of app`s in freshly installed Ubuntu(19.10/20.04).
+Um script simples para instalação de app's em uma distro Ubuntu. 
+A simple script for the first installation of app`s in freshly installed Ubuntu.

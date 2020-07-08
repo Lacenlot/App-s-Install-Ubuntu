@@ -1,8 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PPA_LUTRIS="ppa:lutris-team/lutris"
-GOOGLE_CHROME_LINK="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
-DROPBOX_LINK="https://www.dropbox.com/download?plat=lnx.x86_64"
+APT_APPS=(
+  https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  https://linux.dropbox.com/packages/ubuntu/dropbox_2020.03.04_amd64.deb
+)
 SNAP_APPS=(
  code
  spotify
@@ -10,6 +12,8 @@ SNAP_APPS=(
  postman
  pulseaudio
 )
+
+##### REQUISITOS PARA RODAR O SCRIPT!
 
 if ! ping -c 5 8.8.8.8 -q &> /dev/null; then
   echo "COMPUTADOR SEM CONEXÃO COM A INTERNET!"
@@ -21,6 +25,10 @@ if [[ ! -x `which wget` ]]; then
 else
   echo "WGET JÁ ESTÁ INSTALADO!"
 fi
+
+#####
+
+#### REMOVENDO POSSIVEIS LOCKS, ADICIONANDO REPOSITORIOS E ARQ i386(32Bits)
 
 remove_locks () {
   sudo rm /var/lib/dpkg/lock/frontend
@@ -36,19 +44,22 @@ add_architecture () {
   sudo apt update -y
 }
 
-install_google_chrome () {
-  parser_url=$(echo ${GOOGLE_CHROME_LINK##*/} sed 's/-/_/g' | cut -d _ -f 1)
-  if ! dpkg -l | grep -iq $parser_url; then
-    wget -c "$GOOGLE_CHROME_LINK" -P $HOME/Downloads
-    sudo dpkg -i $HOME/Downloads/${GOOGLE_CHROME_LINK##*/}
-  else
-    echo "GOOGLE CHROME JÁ ESTÁ INSTALADO!"
-  fi
-  sudo apt -f install -y
-}
+####
 
-#wget -O - "$DROPBOX_LINK" | tar xzf -
-#~/.dropbox-dist/dropboxd
+#### INSTALAÇÃO DOS APP'S
+
+install_apts () {
+  for url in ${APT_APPS[@]}; do
+    parser_url=$(echo ${url##*/} sed 's/-/_/g' | cut -d _ -f 1)
+    if ! dpkg -l | grep -iq $parser_url; then
+      wget -c "$url" -P $HOME/Downloads
+      sudo dpkg -i $HOME/Downloads/${url##*/}
+    else
+      echo "PROGRAMA JÁ ESTÁ INSTALADO!"
+    fi
+    sudo apt -f install -y
+  done
+}
 
 install_java_eclipse () {
   if ! dpkg -l | grep -q openjdk-11-jre-headless; then
@@ -56,7 +67,11 @@ install_java_eclipse () {
   else
     echo "JAVA JÁ ESTÁ INSTALADO!"
   fi
-  sudo snap install --classic eclipse
+  if ! snap list | grep -q eclipse; then
+    sudo snap install --classic eclipse
+  else
+    echo "ECLIPSE JÁ ESTÁ INSTALADO!"
+  fi
 }
 
 install_snap_apps () {
@@ -70,16 +85,22 @@ install_snap_apps () {
   done
 }
 
+#####
+
+#### UPDATE E LIMPEZA
+
 upgrade_clear () {
   sudo apt update && sudo apt autoclean && sudo apt autoremove -y
   ##sudo apt update && sudo apt dist-upgrade -y // checar se tem att da distro!
 }
 
+####
+
 cd ~
 remove_locks
 add_architecture
 repository_lutris
-install_google_chrome
+install_apts
 install_java_eclipse
 install_snap_apps
 upgrade_clear
