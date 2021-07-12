@@ -6,11 +6,10 @@ APT_APPS=(
   https://linux.dropbox.com/packages/ubuntu/dropbox_2020.03.04_amd64.deb
 )
 SNAP_APPS=(
- code
  spotify
- discord
+ code
  postman
- pulseaudio
+ vlc
 )
 
 ##### REQUISITOS PARA RODAR O SCRIPT!
@@ -25,8 +24,6 @@ if [[ ! -x `which wget` ]]; then
 else
   echo "WGET JÁ ESTÁ INSTALADO!"
 fi
-
-#####
 
 #### REMOVENDO POSSIVEIS LOCKS, ADICIONANDO REPOSITORIOS E ARQ i386(32Bits)
 
@@ -44,8 +41,6 @@ add_architecture () {
   sudo apt update -y
 }
 
-####
-
 #### INSTALAÇÃO DOS APP'S
 
 install_apts () {
@@ -61,14 +56,14 @@ install_apts () {
   done
 }
 
-install_java_eclipse () {
-  if ! dpkg -l | grep -q openjdk-11-jre-headless; then
-    sudo apt install openjdk-11-jre-headless -y #version 11.0.7+10-2ubuntu2~19.10
+install_java_intellij () {
+  if ! dpkg -l | grep -q openjdk-11-jdk; then
+    sudo apt install openjdk-11-jdk -y
   else
     echo "JAVA JÁ ESTÁ INSTALADO!"
   fi
-  if ! snap list | grep -q eclipse; then
-    sudo snap install --classic eclipse
+  if ! snap list | grep -q intellij-idea-ultimate; then
+    sudo snap install intellij-idea-ultimate --classic
   else
     echo "ECLIPSE JÁ ESTÁ INSTALADO!"
   fi
@@ -77,7 +72,7 @@ install_java_eclipse () {
 install_snap_apps () {
   for apps in ${SNAP_APPS[@]}; do
     if ! snap list | grep -q $apps; then
-      [[ $apps == code ]] && sudo snap install --classic code
+      [[ $apps == code ]] && sudo snap install code --classic
       [[ $apps != code ]] && sudo snap install $apps
     else
       echo "O SNAP JÁ ESTÁ INSTALADO - " $apps
@@ -85,22 +80,40 @@ install_snap_apps () {
   done
 }
 
-#####
+install_docker()  {
+  if ! dpkg -l | grep -q docker-ce; then
+  
+    sudo apt-get update
+  
+    sudo apt-get install \
+    	apt-transport-https \
+    	ca-certificates \
+    	curl \
+    	gnupg \
+    	lsb-release
+ 
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  
+    echo \
+  	"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  	$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  else
+    echo "DOCKER JÁ ESTÁ INSTALADO"
+  fi
+}
 
 #### UPDATE E LIMPEZA
 
 upgrade_clear () {
   sudo apt update && sudo apt autoclean && sudo apt autoremove -y
-  ##sudo apt update && sudo apt dist-upgrade -y // checar se tem att da distro!
+  sudo apt update && sudo apt dist-upgrade -y
 }
-
-####
 
 cd ~
 remove_locks
 add_architecture
 repository_lutris
 install_apts
-install_java_eclipse
+install_java_intellij
 install_snap_apps
 upgrade_clear
