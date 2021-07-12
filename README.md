@@ -1,3 +1,4 @@
-# App-s-Install-Ubuntu
-Um script simples para instalação de app's em uma distro Ubuntu. 
-A simple script for the first installation of app`s in freshly installed Ubuntu.
+# Installing App's Script
+
+Um script para automatizar o processo de instalação de programas e utilitários em um sistema operacional Linux, especificamente para sistemas baseados em debian.
+

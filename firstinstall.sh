@@ -13,7 +13,6 @@ SNAP_APPS=(
 )
 
 ##### REQUISITOS PARA RODAR O SCRIPT!
-
 if ! ping -c 5 8.8.8.8 -q &> /dev/null; then
   echo "COMPUTADOR SEM CONEXÃO COM A INTERNET!"
   exit 1
@@ -24,8 +23,6 @@ if [[ ! -x `which wget` ]]; then
 else
   echo "WGET JÁ ESTÁ INSTALADO!"
 fi
-
-#### REMOVENDO POSSIVEIS LOCKS, ADICIONANDO REPOSITORIOS E ARQ i386(32Bits)
 
 remove_locks () {
   sudo rm /var/lib/dpkg/lock/frontend
@@ -40,8 +37,6 @@ add_architecture () {
   sudo dpkg --add-architecture i386
   sudo apt update -y
 }
-
-#### INSTALAÇÃO DOS APP'S
 
 install_apts () {
   for url in ${APT_APPS[@]}; do
@@ -65,7 +60,7 @@ install_java_intellij () {
   if ! snap list | grep -q intellij-idea-ultimate; then
     sudo snap install intellij-idea-ultimate --classic
   else
-    echo "ECLIPSE JÁ ESTÁ INSTALADO!"
+    echo "INTELLIJ JÁ ESTÁ INSTALADO!"
   fi
 }
 
@@ -101,8 +96,6 @@ install_docker()  {
     echo "DOCKER JÁ ESTÁ INSTALADO"
   fi
 }
-
-#### UPDATE E LIMPEZA
 
 upgrade_clear () {
   sudo apt update && sudo apt autoclean && sudo apt autoremove -y
